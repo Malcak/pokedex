@@ -3,7 +3,7 @@ import Document, {
   Head,
   Main,
   NextScript,
-  DocumentContext
+  DocumentContext,
 } from 'next/document'
 import { CssBaseline } from '@nextui-org/react'
 
@@ -12,7 +12,7 @@ class MyDocument extends Document {
     const initialProps = await Document.getInitialProps(ctx)
     return {
       ...initialProps,
-      styles: [<>{initialProps.styles}</>]
+      styles: [<>{initialProps.styles}</>],
     }
   }
 

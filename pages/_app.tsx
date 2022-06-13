@@ -1,7 +1,8 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import { NextUIProvider } from '@nextui-org/react'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { NextUIProvider } from '@nextui-org/react'
+
 import { darkTheme, lightTheme } from '../lib/theme'
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -11,7 +12,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       attribute="class"
       value={{
         light: lightTheme.className,
-        dark: darkTheme.className
+        dark: darkTheme.className,
       }}
     >
       <NextUIProvider>
