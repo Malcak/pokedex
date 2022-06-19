@@ -1,6 +1,8 @@
 import type { FC, ReactNode } from 'react'
 import Head from 'next/head'
 
+import Navbar from '@components/navbar'
+
 type Props = {
   children?: ReactNode
   title?: string
@@ -15,7 +17,7 @@ const MainLayout: FC<Props> = ({ children, title }) => {
         <meta name="description" content={`information about ${title}`} />
         <meta name="keywords" content={`${title}, pokemon, pokedex`} />
       </Head>
-      {/* navbar */}
+      <Navbar />
       <main>{children}</main>
     </>
   )
