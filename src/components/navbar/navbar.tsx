@@ -31,7 +31,7 @@ const Navbar: FC = () => {
         >
           P
         </span>
-        okemon
+        okémon
       </Text>
       <Spacer
         css={{
