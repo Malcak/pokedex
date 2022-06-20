@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react'
 import Head from 'next/head'
+import { Container } from '@nextui-org/react'
 
 import Navbar from '@components/navbar'
 
@@ -18,7 +19,13 @@ const MainLayout: FC<Props> = ({ children, title }) => {
         <meta name="keywords" content={`${title}, pokemon, pokedex`} />
       </Head>
       <Navbar />
-      <main>{children}</main>
+      <Container
+        css={{
+          marginTop: '$16',
+        }}
+      >
+        {children}
+      </Container>
     </>
   )
 }
