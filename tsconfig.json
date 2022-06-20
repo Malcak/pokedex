@@ -16,8 +16,9 @@
     "incremental": true,
     "baseUrl": "src",
     "paths": {
-      "@api/*": ["api/*"],
+      "@api": ["api"],
       "@components/*": ["components/*"],
+      "@interfaces": ["interfaces"],
       "@lib/*": ["lib/*"],
       "@pages/*": ["pages/*"]
     }
