@@ -1,3 +1,9 @@
 {
-  "conventionalCommits.scopes": ["layout", "components", "api", "index"]
+  "conventionalCommits.scopes": [
+    "layout",
+    "components",
+    "api",
+    "index",
+    "pages"
+  ]
 }
