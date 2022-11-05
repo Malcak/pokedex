@@ -1,50 +1,39 @@
 import type { FC } from 'react'
-import Image from 'next/image'
+import Image from 'next/future/image'
 import { Spacer, Text, useTheme } from '@nextui-org/react'
 import Link from 'next/link'
+import { Navbar as Nav } from "@nextui-org/react";
 
 const Navbar: FC = () => {
   const { theme } = useTheme()
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'start',
-        padding: '0 20px',
-        backgroundColor: theme?.colors.gray50.value,
-      }}
-    >
-      <Link href="/">
-        <span>
+    <Nav isBordered variant='static'>
+        <Nav.Brand>
+          {/* <AcmeLogo /> */}
           <Image
-            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png"
-            alt="icon"
-            width={70}
-            height={70}
-          />
-          <Text weight="bold" h2>
+             src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png"
+             alt="icon"
+             width={72}
+             height={72}
+           />
+           <Text weight="bold" style={{
+             fontSize: '1.4rem'
+           }}>
             <span
               style={{
-                fontSize: '2.5rem',
+                fontSize: '1.6rem',
               }}
             >
               P
             </span>
-            okedex
+            okédex
           </Text>
-        </span>
-      </Link>
-      <Spacer
-        css={{
-          flex: '1',
-        }}
-      />
-      <Text>Favoritos</Text>
-    </div>
+        </Nav.Brand>
+        <Nav.Content hideIn="xs">
+          <Nav.Link href="#">bookmarks</Nav.Link>
+        </Nav.Content>
+      </Nav>
   )
 }
 
