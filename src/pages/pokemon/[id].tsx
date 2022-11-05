@@ -9,25 +9,24 @@ interface Props {
 }
 
 const PokemonPage: NextPage<Props> = ({ pokemon }) => {
-  console.log(pokemon)
 
   return (
     <>
       <h1>
-
+        
       </h1>
     </>
   )
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
+/* export const getStaticPaths: GetStaticPaths = async () => {
   const { data } = await pokeapi.get<PokemonListResponse>('/pokemon?limit=151')
 
   return {
     paths: data.results.map(({ id, name }) => ({ params: { id, name } })),
     fallback: false,
   }
-}
+} */
 
 /* export const getStaticProps: GetStaticProps = async ({params}) => {
   const { data } = await pokeapi.get(`/pokemon/${params?.id}`)
