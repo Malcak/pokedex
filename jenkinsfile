@@ -16,19 +16,20 @@ pipeline {
         label 'terraform'
       }
       steps {
-        sh 'cd terraform'
-        sh 'pwd'
-        sh 'terraform init'
-        sh 'terraform apply -auto-approve'
-        sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
-        sh "terraform output ecr_username | tr -d '" + '"' + "' > ecr_username.txt"
-        sh "terraform output ecr_password | tr -d '" + '"' + "' > ecr_password.txt"
-        script {
-          ecr_repository_url = readFile('ecr_repository_url.txt').trim()
-          ecr_username = readFile('ecr_username.txt').trim()
-          ecr_password = readFile('ecr_password.txt').trim()
+        dir("terraform") {
+          sh 'pwd'
+          sh 'terraform init'
+          sh 'terraform apply -auto-approve'
+          sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
+          sh "terraform output ecr_username | tr -d '" + '"' + "' > ecr_username.txt"
+          sh "terraform output ecr_password | tr -d '" + '"' + "' > ecr_password.txt"
+          script {
+            ecr_repository_url = readFile('ecr_repository_url.txt').trim()
+            ecr_username = readFile('ecr_username.txt').trim()
+            ecr_password = readFile('ecr_password.txt').trim()
+          }
+          sh 'rm -rf ecr_*.txt'
         }
-        sh 'rm -rf ecr_*.txt'
       }
     }
 
