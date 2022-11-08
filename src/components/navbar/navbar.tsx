@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import Image from 'next/future/image'
+import Image from 'next/image'
 import { Spacer, Text, useTheme } from '@nextui-org/react'
 import Link from 'next/link'
 import { Navbar as Nav } from "@nextui-org/react";
