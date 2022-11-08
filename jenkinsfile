@@ -38,7 +38,7 @@ pipeline {
         label 'docker'
       }
       steps {
-        sh " echo ${ecr_password} | docker login --username ${ecr_username} --password-stdin ${ecr_repository_url}"
+        sh "docker login --username ${ecr_username} --password ${ecr_password} ${ecr_repository_url}"
         sh "docker build -t ${ecr_repository_url}/pokedex-repository:latest ."
         sh "docker push ${ecr_repository_url}/pokedex-repository:latest"
         sh 'docker logout'
