@@ -7,22 +7,21 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "pokedex-terraform-state"
-    key = "global/s3/terraform.tfstate"
-    region = "us-east-1"
+    bucket         = "pokedex-terraform-state"
+    key            = "global/s3/terraform.tfstate"
+    region         = "us-east-1"
     dynamodb_table = "pokedex-terraform-locks"
-    encrypt = true
+    encrypt        = true
   }
 }
 
 provider "aws" {
   region = var.region
-  shared_credentials_files = [ "/home/malcak/.devtools/.aws/credentials" ]
 }
 
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "pokedex-terraform-state"
-  
+
   lifecycle {
     prevent_destroy = true
   }
@@ -68,7 +67,7 @@ resource "aws_ecr_repository" "pokedex_repository" {
   name = "pokedex-repository"
   tags = {
     "Environment" = var.environment
-    "Project" = var.project
+    "Project"     = var.project
   }
 }
 
