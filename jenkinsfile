@@ -19,19 +19,19 @@ pipeline {
         sh 'cd terraform'
         sh 'terraform init'
         sh 'terraform apply -auto-approve'
-        ecr_repository_url = sh(
-          script: "terraform output ecr_repository_url | tr -d '" + '"' + "'",
-          returnStdout: true,
-        )
-        ecr_username = sh(
-          script: "terraform output ecr_username | tr -d '" + '"' + "'",
-          returnStdout: true,
-        )
-        ecr_password = sh(
-          script: "terraform output ecr_password | tr -d '" + '"' + "'",
-          returnStdout: true,
-        )
       }
+      ecr_repository_url = sh(
+        script: "terraform output ecr_repository_url | tr -d '" + '"' + "'",
+        returnStdout: true,
+      )
+      ecr_username = sh(
+        script: "terraform output ecr_username | tr -d '" + '"' + "'",
+        returnStdout: true,
+      )
+      ecr_password = sh(
+        script: "terraform output ecr_password | tr -d '" + '"' + "'",
+        returnStdout: true,
+      )
     }
 
     stage('Build Image') {
