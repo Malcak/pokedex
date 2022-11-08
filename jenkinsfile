@@ -1,19 +1,51 @@
+def ecr_repository_url
+def ecr_username
+def ecr_password
+
 pipeline {
-  agent {
-    label 'docker'
+  agent none
+
+  environment {
+    AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
   }
 
   stages {
-    stage('Build') {
+    stage('Prepare Infrastructure') {
+      agent { 
+        label 'terraform'
+      }
       steps {
-        echo 'Building..'
+        sh 'cd terraform'
+        sh 'terraform init'
+        sh 'terraform apply -auto-approve'
+        ecr_repository_url = sh(
+          script: "terraform output ecr_repository_url | tr -d '" + '"' + "'",
+          returnStdout: true,
+        )
+        ecr_username = sh(
+          script: "terraform output ecr_username | tr -d '" + '"' + "'",
+          returnStdout: true,
+        )
+        ecr_password = sh(
+          script: "terraform output ecr_password | tr -d '" + '"' + "'",
+          returnStdout: true,
+        )
       }
     }
-    stage('Test') {
+
+    stage('Build Image') {
+      agent { 
+        label 'docker'
+      }
       steps {
-        echo 'Testing..'
+        sh " echo ${ecr_password} | docker login --username ${ecr_username} --password-stdin ${ecr_repository_url}"
+        sh "docker build -t ${ecr_repository_url}/pokedex:latest ."
+        sh "docker push ${ecr_repository_url}/pokedex:latest"
+        sh 'docker logout'
       }
     }
+
     stage('Deploy') {
       steps {
         echo 'Deploying....'
