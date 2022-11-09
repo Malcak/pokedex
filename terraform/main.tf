@@ -181,7 +181,7 @@ resource "aws_lb_listener" "pokedex_lb_listener" {
 }
 
 data "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecs-task-execution-role"
+  name = "ecsTaskExecutionRole"
 }
 
 resource "aws_ecs_task_definition" "pokedex_ecs_td" {
