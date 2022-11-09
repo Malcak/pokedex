@@ -180,12 +180,18 @@ resource "aws_lb_listener" "pokedex_lb_listener" {
   }
 }
 
+data "aws_iam_role" "ecs_task_execution_role" {
+  name = "ecsTaskExecutionRole"
+}
+
 resource "aws_ecs_task_definition" "pokedex_ecs_td" {
   family                   = "pokedex"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 1024
   memory                   = 2048
+  task_role_arn            = aws_iam_role.github-role.arn
+  execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = <<DEFINITION
   [
