@@ -3,11 +3,15 @@ output "ecr_repository_url" {
 }
 
 output "ecr_username" {
-  value = data.aws_ecr_authorization_token.token.user_name
+  value     = data.aws_ecr_authorization_token.token.user_name
   sensitive = true
 }
 
 output "ecr_password" {
-  value = data.aws_ecr_authorization_token.token.password
+  value     = data.aws_ecr_authorization_token.token.password
   sensitive = true
+}
+
+output "load_balancer_ip" {
+  value = aws_lb.default.dns_name
 }
