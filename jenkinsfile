@@ -1,4 +1,6 @@
 def ecr_repository_url
+def ecr_username
+def ecr_password
 def ecs_cluster_arn
 def ecs_service_name
 
@@ -8,8 +10,6 @@ pipeline {
   environment {
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    ecr_password = credentials('ecr_password')
-    ecr_username = credentials('ecr_username')
   }
 
   stages {
@@ -23,10 +23,14 @@ pipeline {
           sh 'terraform init'
           sh 'terraform apply -auto-approve'
           sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
+          sh "terraform output ecr_username | tr -d '" + '"' + "' > ecr_username.txt"
+          sh "terraform output ecr_password | tr -d '" + '"' + "' > ecr_password.txt"
           sh "terraform output ecs_cluster_arn | tr -d '" + '"' + "' > ecs_cluster_arn.txt"
           sh "terraform output ecs_service_name | tr -d '" + '"' + "' > ecs_service_name.txt"
           script {
             ecr_repository_url = readFile('ecr_repository_url.txt').trim()
+            ecr_username = readFile('ecr_username.txt').trim()
+            ecr_password = readFile('ecr_password.txt').trim()
             ecs_cluster_arn = readFile('ecs_cluster_arn.txt').trim()
             ecs_service_name = readFile('ecs_service_name.txt').trim()
           }
