@@ -55,3 +55,6 @@ crash.*.log
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+/test-results/
+/playwright-report/
+/playwright/.cache/
