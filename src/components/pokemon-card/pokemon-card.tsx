@@ -13,7 +13,7 @@ const PokemonCard: FC<Props> = ({ pokemon }) => {
 
   return (
     <Grid xs={6} sm={3} md={2} xl={1}>
-      {/* <Link href={`/pokemon/${id}`}> */}
+      <Link href={`/pokemon/${id}`}>
         <Card isHoverable isPressable variant="bordered">
           <Card.Body
             css={{
@@ -45,7 +45,7 @@ const PokemonCard: FC<Props> = ({ pokemon }) => {
             </Row>
           </Card.Footer>
         </Card>
-      {/* </Link> */}
+      </Link>
     </Grid>
   )
 }

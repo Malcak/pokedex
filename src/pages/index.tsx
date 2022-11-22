@@ -1,7 +1,7 @@
 import type { GetStaticProps, NextPage } from 'next'
 import { Grid } from '@nextui-org/react'
 
-import type { PokemonListItemResponse, PokemonListResponse } from '@interfaces'
+import type { PokemonListItemResponse } from '@interfaces'
 import PokemonCard from '@components/pokemon-card'
 import pokeapi from '@api'
 
@@ -22,17 +22,15 @@ const Home: NextPage<Props> = ({ pokemons }) => {
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const { data } = await pokeapi.get<PokemonListResponse>('/pokemon?limit=151')
+  const { results } = await pokeapi.listPokemons(0, 151)
 
-  const pokemons: PokemonListItemResponse[] = data.results.map(
-    (pokemon, index) => ({
-      ...pokemon,
-      id: `${index + 1}`,
-      img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
-        index + 1
-      }.png`,
-    }),
-  )
+  const pokemons: PokemonListItemResponse[] = results.map((pokemon, index) => ({
+    ...pokemon,
+    id: `${index + 1}`,
+    img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
+      index + 1
+    }.png`,
+  }))
 
   return {
     props: {
