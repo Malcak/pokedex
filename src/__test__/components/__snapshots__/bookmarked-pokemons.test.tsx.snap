@@ -1,0 +1,157 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Bookmarked Pokemons Component should display the component correctly 1`] = `
+<div>
+  <div
+    class="nextui-c-kRHeuF nextui-c-kRHeuF-ihdrkwy-css nextui-grid-item nextui-grid-container"
+  >
+    <div
+      class="nextui-c-kRHeuF nextui-c-kRHeuF-ihqYMFD-css nextui-grid-item xs sm md xl"
+    >
+      <div
+        class="nextui-c-BDLTQ nextui-c-jMTBsW nextui-c-PJLV nextui-c-BDLTQ-kUADSW-variant-bordered nextui-c-BDLTQ-fmlsco-borderWeight-light nextui-c-BDLTQ-cuwTXc-disableAnimation-false nextui-c-BDLTQ-iZxJaC-isPressable-true nextui-c-PJLV-gulvcB-isFocusVisible-false"
+        role="button"
+        tabindex="0"
+      >
+        <div
+          class="nextui-c-eFfoBo nextui-c-eFfoBo-ifRCjYa-css"
+        >
+          <div
+            class="nextui-c-iVzbCs nextui-c-iVzbCs-bDGmTT-ready-true nextui-c-iVzbCs-iglXcVt-css nextui-image-container nextui-image--loading"
+            data-state="loading"
+          >
+            <div
+              class="nextui-c-FIiRH nextui-c-FIiRH-ibDGmTT-css nextui-image-skeleton"
+            />
+            <img
+              alt="placeholder"
+              class="nextui-c-kbhVdb nextui-c-kbhVdb-ifRKYWh-css nextui-image"
+              data-state="loading"
+              height="140"
+              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+              width="100%"
+            />
+          </div>
+        </div>
+        <div
+          class="nextui-c-cakKrd"
+        >
+          <div
+            class="nextui-c-dfbgCO nextui-c-dfbgCO-fGHEql-fluid-true nextui-c-dfbgCO-ijHOHeI-css"
+          >
+            <b
+              class="nextui-c-PJLV nextui-c-PJLV-iUDWNt-css"
+            >
+              placeholder
+            </b>
+            <p
+              class="nextui-c-PJLV nextui-c-PJLV-igzIIoY-css"
+            >
+              # 
+              1
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="nextui-c-kRHeuF nextui-c-kRHeuF-ihqYMFD-css nextui-grid-item xs sm md xl"
+    >
+      <div
+        class="nextui-c-BDLTQ nextui-c-jMTBsW nextui-c-PJLV nextui-c-BDLTQ-kUADSW-variant-bordered nextui-c-BDLTQ-fmlsco-borderWeight-light nextui-c-BDLTQ-cuwTXc-disableAnimation-false nextui-c-BDLTQ-iZxJaC-isPressable-true nextui-c-PJLV-gulvcB-isFocusVisible-false"
+        role="button"
+        tabindex="0"
+      >
+        <div
+          class="nextui-c-eFfoBo nextui-c-eFfoBo-ifRCjYa-css"
+        >
+          <div
+            class="nextui-c-iVzbCs nextui-c-iVzbCs-bDGmTT-ready-true nextui-c-iVzbCs-iglXcVt-css nextui-image-container nextui-image--loading"
+            data-state="loading"
+          >
+            <div
+              class="nextui-c-FIiRH nextui-c-FIiRH-ibDGmTT-css nextui-image-skeleton"
+            />
+            <img
+              alt="placeholder"
+              class="nextui-c-kbhVdb nextui-c-kbhVdb-ifRKYWh-css nextui-image"
+              data-state="loading"
+              height="140"
+              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png"
+              width="100%"
+            />
+          </div>
+        </div>
+        <div
+          class="nextui-c-cakKrd"
+        >
+          <div
+            class="nextui-c-dfbgCO nextui-c-dfbgCO-fGHEql-fluid-true nextui-c-dfbgCO-ijHOHeI-css"
+          >
+            <b
+              class="nextui-c-PJLV nextui-c-PJLV-iUDWNt-css"
+            >
+              placeholder
+            </b>
+            <p
+              class="nextui-c-PJLV nextui-c-PJLV-igzIIoY-css"
+            >
+              # 
+              4
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="nextui-c-kRHeuF nextui-c-kRHeuF-ihqYMFD-css nextui-grid-item xs sm md xl"
+    >
+      <div
+        class="nextui-c-BDLTQ nextui-c-jMTBsW nextui-c-PJLV nextui-c-BDLTQ-kUADSW-variant-bordered nextui-c-BDLTQ-fmlsco-borderWeight-light nextui-c-BDLTQ-cuwTXc-disableAnimation-false nextui-c-BDLTQ-iZxJaC-isPressable-true nextui-c-PJLV-gulvcB-isFocusVisible-false"
+        role="button"
+        tabindex="0"
+      >
+        <div
+          class="nextui-c-eFfoBo nextui-c-eFfoBo-ifRCjYa-css"
+        >
+          <div
+            class="nextui-c-iVzbCs nextui-c-iVzbCs-bDGmTT-ready-true nextui-c-iVzbCs-iglXcVt-css nextui-image-container nextui-image--loading"
+            data-state="loading"
+          >
+            <div
+              class="nextui-c-FIiRH nextui-c-FIiRH-ibDGmTT-css nextui-image-skeleton"
+            />
+            <img
+              alt="placeholder"
+              class="nextui-c-kbhVdb nextui-c-kbhVdb-ifRKYWh-css nextui-image"
+              data-state="loading"
+              height="140"
+              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png"
+              width="100%"
+            />
+          </div>
+        </div>
+        <div
+          class="nextui-c-cakKrd"
+        >
+          <div
+            class="nextui-c-dfbgCO nextui-c-dfbgCO-fGHEql-fluid-true nextui-c-dfbgCO-ijHOHeI-css"
+          >
+            <b
+              class="nextui-c-PJLV nextui-c-PJLV-iUDWNt-css"
+            >
+              placeholder
+            </b>
+            <p
+              class="nextui-c-PJLV nextui-c-PJLV-igzIIoY-css"
+            >
+              # 
+              7
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -1,20 +1,24 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test'
 
-test('homepage has title and links to intro page', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+test('pokemon list page has title and links to each pokemon page', async ({ page }) => {
+  await page.goto('http://localhost:3000')
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
+  await expect(page).toHaveTitle(/pokemon/)
 
-  // create a locator
-  const getStarted = page.getByRole('link', { name: 'Get started' });
+  const bulbasaurCard = page.getByRole('button').getByText('Bulbasaur')
+  await bulbasaurCard.click()
+  await expect(page).toHaveURL(/.pokemon\/*1/)
 
-  // Expect an attribute "to be strictly equal" to the value.
-  await expect(getStarted).toHaveAttribute('href', '/docs/intro');
+  const pokemonPageHeader = page.getByRole("heading")
+  await expect(pokemonPageHeader).toHaveText('bulbasaur')
+})
 
-  // Click the get started link.
-  await getStarted.click();
+test('pokemon list has title and links to bookmarks page', async ({page}) => {
+  await page.goto('http://localhost:3000')
 
-  // Expects the URL to contain intro.
-  await expect(page).toHaveURL(/.*intro/);
-});
+  await expect(page).toHaveTitle(/pokemon/)
+
+  const bookmarks = page.getByRole('link', { name: 'Bookmarks' })
+  await bookmarks.click()
+  await expect(page).toHaveURL(/.*bookmarks/)
+})
