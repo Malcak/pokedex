@@ -10,6 +10,7 @@ pipeline {
   environment {
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    TF_IN_AUTOMATION      = '1'
   }
 
   stages {
@@ -20,8 +21,8 @@ pipeline {
       steps {
         dir("terraform") {
           sh 'pwd'
-          sh 'terraform init'
-          sh 'terraform apply -auto-approve'
+          sh 'terraform init -input=false'
+          sh 'terraform apply -input=false -auto-approve -no-color'
           sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
           sh "terraform output ecr_username | tr -d '" + '"' + "' > ecr_username.txt"
           sh "terraform output ecr_password | tr -d '" + '"' + "' > ecr_password.txt"
