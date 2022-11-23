@@ -31,16 +31,17 @@ pipeline {
     }
 
     stage('Build Image') {
-      node('Terraform Worker') {
-        steps {
-          sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ecr_repository_url}"
-          sh "docker build -t ${ecr_repository_url} . --no-cache"
-          sh "docker tag ${ecr_repository_url}:latest ${ecr_repository_url}:0.0.${BUILD_NUMBER}"
-          sh "docker push ${ecr_repository_url}:latest"
-          sh "docker push ${ecr_repository_url}:0.0.${BUILD_NUMBER}"
-          sh 'docker logout'
-          sh 'docker image prune -a'
-        }
+      agent {
+        label 'docker && awscli'
+      }
+      steps {
+        sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ecr_repository_url}"
+        sh "docker build -t ${ecr_repository_url} . --no-cache"
+        sh "docker tag ${ecr_repository_url}:latest ${ecr_repository_url}:0.0.${BUILD_NUMBER}"
+        sh "docker push ${ecr_repository_url}:latest"
+        sh "docker push ${ecr_repository_url}:0.0.${BUILD_NUMBER}"
+        sh 'docker logout'
+        sh 'docker image prune -a'
       }
     }
 
