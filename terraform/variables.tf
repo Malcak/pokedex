@@ -6,11 +6,13 @@ variable "region" {
 
 variable "environment" {
   description = "Environment Name"
-  default     = "dev"
+  type        = string
+  default     = "prod"
 }
 
 variable "project" {
   description = "Project Name"
+  type        = string
   default     = "pokedex"
 }
 

@@ -1,5 +1,5 @@
 output "ecr_repository_url" {
-  value = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com"
+  value = module.ecr.ecr_repository_url
 }
 
 output "ecr_username" {
