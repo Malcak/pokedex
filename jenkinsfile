@@ -1,6 +1,4 @@
 def ecr_repository_url
-def ecr_username
-def ecr_password
 def ecs_cluster_arn
 def ecs_service_name
 
@@ -14,6 +12,38 @@ pipeline {
   }
 
   stages {
+    stage('Prepare Image Registry') {
+      agent { 
+        label 'terraform'
+      }
+      steps {
+        dir("terraform") {
+          sh 'pwd'
+          sh 'terraform init -input=false'
+          sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
+          sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
+          script {
+            ecr_repository_url = readFile('ecr_repository_url.txt').trim()
+          }
+          sh 'rm -rf ecr_repository_url.txt'
+        }
+      }
+    }
+
+    stage('Build Image') {
+      node('Terraform Worker') {
+        steps {
+          sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ecr_repository_url}"
+          sh "docker build -t ${ecr_repository_url} . --no-cache"
+          sh "docker tag ${ecr_repository_url}:latest ${ecr_repository_url}:0.0.${BUILD_NUMBER}"
+          sh "docker push ${ecr_repository_url}:latest"
+          sh "docker push ${ecr_repository_url}:0.0.${BUILD_NUMBER}"
+          sh 'docker logout'
+          sh 'docker image prune -a'
+        }
+      }
+    }
+
     stage('Prepare Infrastructure') {
       agent { 
         label 'terraform'
@@ -24,14 +54,10 @@ pipeline {
           sh 'terraform init -input=false'
           sh 'terraform apply -input=false -auto-approve -no-color'
           sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
-          sh "terraform output ecr_username | tr -d '" + '"' + "' > ecr_username.txt"
-          sh "terraform output ecr_password | tr -d '" + '"' + "' > ecr_password.txt"
           sh "terraform output ecs_cluster_arn | tr -d '" + '"' + "' > ecs_cluster_arn.txt"
           sh "terraform output ecs_service_name | tr -d '" + '"' + "' > ecs_service_name.txt"
           script {
             ecr_repository_url = readFile('ecr_repository_url.txt').trim()
-            ecr_username = readFile('ecr_username.txt').trim()
-            ecr_password = readFile('ecr_password.txt').trim()
             ecs_cluster_arn = readFile('ecs_cluster_arn.txt').trim()
             ecs_service_name = readFile('ecs_service_name.txt').trim()
           }
@@ -40,26 +66,13 @@ pipeline {
       }
     }
 
-    stage('Build Image') {
-      agent { 
-        label 'docker'
-      }
-      steps {
-        sh "docker login --username ${ecr_username} --password ${ecr_password} ${ecr_repository_url}"
-        sh "docker build -t ${ecr_repository_url}/pokedex-repository . --no-cache"
-        sh "docker tag ${ecr_repository_url}/pokedex-repository:latest ${ecr_repository_url}/pokedex-repository:0.0.${BUILD_NUMBER}"
-        sh "docker push ${ecr_repository_url}/pokedex-repository:latest"
-        sh 'docker logout'
-        sh 'docker image prune -a'
-      }
-    }
-
     stage('Deploy') {
       agent { 
         label 'awscli'
       }
       steps {
-        sh "aws ecs update-service --cluster ${ecs_cluster_arn} --service ${ecs_service_name} --force-new-deployment --region us-east-1"
+        // sh "aws ecs update-service --cluster ${ecs_cluster_arn} --service ${ecs_service_name} --force-new-deployment --region us-east-1"
+        echo "Deploying..."
       }
     }
   }
