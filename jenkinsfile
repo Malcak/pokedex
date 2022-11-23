@@ -50,7 +50,7 @@ pipeline {
         sh "docker tag ${ecr_repository_url}/pokedex-repository:latest ${ecr_repository_url}/pokedex-repository:0.0.${BUILD_NUMBER}"
         sh "docker push ${ecr_repository_url}/pokedex-repository:latest"
         sh 'docker logout'
-        sh 'docker system prune -a'
+        sh 'docker image prune -a'
       }
     }
 
