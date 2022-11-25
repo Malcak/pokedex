@@ -4,6 +4,8 @@ on:
     branches: [ develpment ]
   pull_request:
     branches: [ develpment ]
+  workflow_dispatch:
+
 jobs:
   jest:
     timeout-minutes: 60
