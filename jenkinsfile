@@ -3,6 +3,10 @@ def ECR_REPOSITORY_URL
 pipeline {
   agent none
 
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '4', artifactNumToKeepStr: '4'))
+  }
+
   environment {
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
