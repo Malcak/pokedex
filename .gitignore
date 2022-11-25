@@ -58,3 +58,6 @@ terraform.rc
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Project specific
+__tests__/__results__

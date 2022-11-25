@@ -17,6 +17,7 @@ const customJestConfig = {
     '^@lib/(.*)$': '<rootDir>/src/lib/$1',
     '^@pages/(.*)$': '<rootDir>/src/pages/$1',
   },
+  modulePathIgnorePatterns: ['data', 'e2e'],
 }
 
 module.exports = createJestConfig(customJestConfig)
