@@ -9,6 +9,8 @@ pipeline {
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     TF_IN_AUTOMATION      = '1'
+    RELEASE_NOTES = sh (script: """git log --format="medium" -1 ${GIT_COMMIT}""", returnStdout:true)
+    GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
   }
 
   stages {
@@ -37,23 +39,24 @@ pipeline {
       steps {
         sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ecr_repository_url}"
         sh "docker build -t ${ecr_repository_url} . --no-cache"
-        sh "docker tag ${ecr_repository_url}:latest ${ecr_repository_url}:0.0.${BUILD_NUMBER}"
+        sh "docker tag ${ecr_repository_url}:latest ${ecr_repository_url}:${GIT_COMMIT_HASH}"
+        // change build number to commit hash
         sh "docker push ${ecr_repository_url}:latest"
-        sh "docker push ${ecr_repository_url}:0.0.${BUILD_NUMBER}"
+        sh "docker push ${ecr_repository_url}:${GIT_COMMIT_HASH}"
         sh 'docker logout'
         sh 'docker image prune -a'
       }
     }
 
-    stage('Prepare Infrastructure') {
+    stage('Deploy') {
       agent { 
         label 'terraform'
       }
       steps {
         dir("terraform") {
-          sh 'pwd'
-          sh 'terraform init -input=false'
-          sh 'terraform apply -input=false -auto-approve -no-color'
+          sh "pwd"
+          sh "terraform init -input=false"
+          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -auto-approve -no-color"
           sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
           sh "terraform output ecs_cluster_arn | tr -d '" + '"' + "' > ecs_cluster_arn.txt"
           sh "terraform output ecs_service_name | tr -d '" + '"' + "' > ecs_service_name.txt"
@@ -64,16 +67,6 @@ pipeline {
           }
           sh 'rm -rf ecr_*.txt'
         }
-      }
-    }
-
-    stage('Deploy') {
-      agent { 
-        label 'awscli'
-      }
-      steps {
-        // sh "aws ecs update-service --cluster ${ecs_cluster_arn} --service ${ecs_service_name} --force-new-deployment --region us-east-1"
-        echo "Deploying..."
       }
     }
   }

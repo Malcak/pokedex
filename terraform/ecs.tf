@@ -9,7 +9,7 @@ resource "aws_ecs_task_definition" "pokedex_ecs_td" {
   container_definitions = <<DEFINITION
   [
     {
-      "image": "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/pokedex-repository:latest",
+      "image": "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/pokedex-repository:${var.image_tag}",
       "cpu": 256,
       "memory": 512,
       "name": "pokedex",
