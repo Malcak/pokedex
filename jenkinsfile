@@ -15,6 +15,7 @@ pipeline {
   }
 
   stages {
+    agent any
     stage("Trigger GitHub Actions") {
       steps {
         script {
