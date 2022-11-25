@@ -1,4 +1,4 @@
-def ecr_repository_url
+def ECR_REPOSITORY_URL
 
 pipeline {
   agent none
@@ -18,7 +18,12 @@ pipeline {
         dir("terraform") {
           sh 'terraform init -input=false'
           sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
-          ecr_repository_url = sh (script: "terraform output ecr_repository_url | tr -d '" + '"' + "'", returnStdout: true)
+          script {
+            ECR_REPOSITORY_URL = sh (
+              script: "terraform output --raw ECR_REPOSITORY_URL", 
+              returnStdout: true
+            )
+          }
         }
       }
     }
@@ -31,11 +36,11 @@ pipeline {
         GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
       }
       steps {
-        sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ecr_repository_url}"
-        sh "docker build -t ${ecr_repository_url} . --no-cache"
-        sh "docker tag ${ecr_repository_url}:latest ${ecr_repository_url}:${GIT_COMMIT_HASH}"
-        sh "docker push ${ecr_repository_url}:latest"
-        sh "docker push ${ecr_repository_url}:${GIT_COMMIT_HASH}"
+        sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}"
+        sh "docker build -t ${ECR_REPOSITORY_URL} . --no-cache"
+        sh "docker tag ${ECR_REPOSITORY_URL}:latest ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
+        sh "docker push ${ECR_REPOSITORY_URL}:latest"
+        sh "docker push ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
         sh 'docker logout'
         sh 'docker image prune -a'
       }
