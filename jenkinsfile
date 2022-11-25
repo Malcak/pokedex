@@ -24,7 +24,7 @@ pipeline {
             -H 'Accept: application/vnd.github+json' \
             -H 'Authorization: Bearer ${GITHUB_AUTH_TOKEN}' \
             https://api.github.com/repos/malcak/pokedex/actions/workflows/ci.yml/dispatches \
-            -d '{\"ref:\": \"development\"}'", returnStdout: true).trim()
+            -d '{"ref": "development"}'", returnStdout: true).trim()
           echo response
         }
       }
