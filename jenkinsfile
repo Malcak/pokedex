@@ -1,6 +1,4 @@
 def ecr_repository_url
-def ecs_cluster_arn
-def ecs_service_name
 
 pipeline {
   agent none
@@ -23,9 +21,8 @@ pipeline {
           sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
           sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
           script {
-            ecr_repository_url = readFile('ecr_repository_url.txt').trim()
+            ecr_repository_url = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
           }
-          sh 'rm -rf ecr_repository_url.txt'
         }
       }
     }
@@ -41,7 +38,6 @@ pipeline {
         sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ecr_repository_url}"
         sh "docker build -t ${ecr_repository_url} . --no-cache"
         sh "docker tag ${ecr_repository_url}:latest ${ecr_repository_url}:${GIT_COMMIT_HASH}"
-        // change build number to commit hash
         sh "docker push ${ecr_repository_url}:latest"
         sh "docker push ${ecr_repository_url}:${GIT_COMMIT_HASH}"
         sh 'docker logout'
@@ -61,15 +57,7 @@ pipeline {
           sh "pwd"
           sh "terraform init -input=false"
           sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -auto-approve -no-color"
-          sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
-          sh "terraform output ecs_cluster_arn | tr -d '" + '"' + "' > ecs_cluster_arn.txt"
-          sh "terraform output ecs_service_name | tr -d '" + '"' + "' > ecs_service_name.txt"
-          script {
-            ecr_repository_url = readFile('ecr_repository_url.txt').trim()
-            ecs_cluster_arn = readFile('ecs_cluster_arn.txt').trim()
-            ecs_service_name = readFile('ecs_service_name.txt').trim()
-          }
-          sh 'rm -rf ecr_*.txt'
+          sh "terraform output"
         }
       }
     }
