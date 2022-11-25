@@ -15,8 +15,8 @@ pipeline {
   }
 
   stages {
-    agent any
     stage("Trigger GitHub Actions") {
+      agent any
       steps {
         script {
           final String response = sh(script: "curl \
