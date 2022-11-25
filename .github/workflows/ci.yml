@@ -21,9 +21,3 @@ jobs:
       run: yarn lint
     - name: Run Jest tests
       run: yarn test
-    - name: Upload test results
-      if: success() || failure()
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: __tests__/__results__/*.xml
