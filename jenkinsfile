@@ -19,9 +19,8 @@ pipeline {
           sh 'pwd'
           sh 'terraform init -input=false'
           sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
-          sh "terraform output ecr_repository_url | tr -d '" + '"' + "' > ecr_repository_url.txt"
           script {
-            ecr_repository_url = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
+            ecr_repository_url = sh (script: "terraform output ecr_repository_url | tr -d '" + '"' + "'", returnStdout: true)
           }
         }
       }
