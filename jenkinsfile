@@ -10,10 +10,26 @@ pipeline {
   environment {
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    GITHUB_AUTH_TOKEN = credentials('	github-jenkins-token')
     TF_IN_AUTOMATION      = '1'
   }
 
   stages {
+    stage("Trigger GitHub Actions") {
+      steps {
+        script {
+          final String response = sh(script: "curl \
+            --X POST \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'Authorization: Bearer ${GITHUB_AUTH_TOKEN}' \
+            https://api.github.com/repos/malcak/pokedex/ci/dispatches \
+            -d '{\"ref:\": \"development\"}'", returnStdout: true).trim()
+          echo response
+        }
+      }
+    }
+
+
     stage('Prepare Image Registry') {
       agent { 
         label 'terraform'
@@ -40,13 +56,14 @@ pipeline {
         GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
       }
       steps {
-        sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}"
-        sh "docker build -t ${ECR_REPOSITORY_URL} . --no-cache"
-        sh "docker tag ${ECR_REPOSITORY_URL}:latest ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
-        sh "docker push ${ECR_REPOSITORY_URL}:latest"
-        sh "docker push ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
-        sh 'docker logout'
-        sh 'docker system prune -a'
+        // sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}"
+        // sh "docker build -t ${ECR_REPOSITORY_URL} . --no-cache"
+        // sh "docker tag ${ECR_REPOSITORY_URL}:latest ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
+        // sh "docker push ${ECR_REPOSITORY_URL}:latest"
+        // sh "docker push ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
+        // sh 'docker logout'
+        // sh 'docker system prune -a'
+        echo "Building..."
       }
     }
 
@@ -59,12 +76,19 @@ pipeline {
       }
       steps {
         dir("terraform") {
-          sh "pwd"
-          sh "terraform init -input=false"
-          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -auto-approve -no-color"
-          sh "terraform output"
+          // sh "pwd"
+          // sh "terraform init -input=false"
+          // sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -auto-approve -no-color"
+          // sh "terraform output"
+          echo "Deploying..."
         }
       }
     }
+
+    // post {
+    //   always {
+    //     emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+    //   }
+    // }
   }
 }
