@@ -36,16 +36,17 @@ pipeline {
         label 'terraform'
       }
       steps {
-        dir("terraform") {
-          sh 'terraform init -input=false'
-          sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
-          script {
-            ECR_REPOSITORY_URL = sh (
-              script: "terraform output --raw ecr_repository_url", 
-              returnStdout: true
-            )
-          }
-        }
+        // dir("terraform") {
+        //   sh 'terraform init -input=false'
+        //   sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
+        //   script {
+        //     ECR_REPOSITORY_URL = sh (
+        //       script: "terraform output --raw ecr_repository_url", 
+        //       returnStdout: true
+        //     )
+        //   }
+        // }
+        echo "Preparing..."
       }
     }
 
