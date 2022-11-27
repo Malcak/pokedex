@@ -10,47 +10,39 @@ pipeline {
   environment {
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    GITHUB_AUTH_TOKEN = credentials('github-jenkins-token')
     TF_IN_AUTOMATION      = '1'
   }
 
   stages {
-    stage("Trigger GitHub Actions") {
-      agent any
+    stage('Run Unit test') {
+      agent {
+        label 'docker'
+      }
       steps {
-        script {
-          final String response = sh(script: "curl \
-            -X POST \
-            -H 'Accept: application/vnd.github+json' \
-            -H 'Authorization: Bearer ${GITHUB_AUTH_TOKEN}' \
-            https://api.github.com/repos/malcak/pokedex/actions/workflows/ci.yml/dispatches \
-            -d '{\"ref\": \"development\"}'", returnStdout: true).trim()
-          echo response
-        }
+        sh "docker run --rm -m 1g --cpus 1 -v $(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
+        sh "docker run --rm -m 1g --cpus 1 -v $(pwd):/app node:16 yarn --cwd '/app' test"
       }
     }
-
 
     stage('Prepare Image Registry') {
       agent { 
         label 'terraform'
       }
       steps {
-        // dir("terraform") {
-        //   sh 'terraform init -input=false'
-        //   sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
-        //   script {
-        //     ECR_REPOSITORY_URL = sh (
-        //       script: "terraform output --raw ecr_repository_url", 
-        //       returnStdout: true
-        //     )
-        //   }
-        // }
-        echo "Preparing..."
+        dir("terraform/global") {
+          sh 'terraform init -input=false'
+          sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
+          script {
+            ECR_REPOSITORY_URL = sh (
+              script: "terraform output --raw ecr_repository_url", 
+              returnStdout: true
+            )
+          }
+        }
       }
     }
 
-    stage('Build Image') {
+    stage('Build & Push Image') {
       agent {
         label 'docker && awscli'
       }
