@@ -112,7 +112,7 @@ pipeline {
         sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
         script {
           E2E_TESTS_RESULTS = sh (
-            script: "docker run --rm -m 1g --cpus 1 -e PAGE_URL=${STAGE_APP_URL} -v $(pwd):/app mcr.microsoft.com/playwright:v1.28.0-focal yarn --cwd '/app' test:e2e",
+            script: "docker run --rm -m 1g --cpus 1 -e PAGE_URL='${STAGE_APP_URL}' -v $(pwd):/app mcr.microsoft.com/playwright:v1.28.0-focal yarn --cwd '/app' test:e2e",
             returnStatus: true
           )
         }
