@@ -21,6 +21,7 @@ pipeline {
       steps {
         sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
         sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' test"
+        junit '__tests__/__results__/jest-junit.xml'
       }
     }
 
