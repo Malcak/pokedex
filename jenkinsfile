@@ -128,7 +128,7 @@ pipeline {
             currentBuild.result = 'ABORTED'
             error('Stopping early due to e2e tests failure')
           } else {
-            input(message: 'Deploy to production?' ok: 'Yes')
+            input(message: 'Deploy to production?', ok: 'Yes')
           }
         }
       }
