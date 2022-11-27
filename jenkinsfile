@@ -19,8 +19,8 @@ pipeline {
         label 'docker'
       }
       steps {
-        sh "docker run --rm -m 1g --cpus 1 -v $(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
-        sh "docker run --rm -m 1g --cpus 1 -v $(pwd):/app node:16 yarn --cwd '/app' test"
+        sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
+        sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' test"
       }
     }
 
