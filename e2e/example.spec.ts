@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test'
 
+const pageUrl = process.env.PAGE_URL || 'http://localhost:3000'
+
 test('pokemon list page has title and links to each pokemon page', async ({ page }) => {
-  await page.goto('http://localhost:3000')
+  await page.goto(pageUrl)
 
   await expect(page).toHaveTitle(/pokemon/)
 
@@ -14,7 +16,7 @@ test('pokemon list page has title and links to each pokemon page', async ({ page
 })
 
 test('pokemon list has title and links to bookmarks page', async ({page}) => {
-  await page.goto('http://localhost:3000')
+  await page.goto(pageUrl)
 
   await expect(page).toHaveTitle(/pokemon/)
 

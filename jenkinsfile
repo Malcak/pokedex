@@ -1,6 +1,8 @@
 static final EXPECTED_TESTS_RESULTS = 0
 def ECR_REPOSITORY_URL
-def TESTS_RESULTS
+def UNIT_TESTS_RESULTS
+def E2E_TESTS_RESULTS
+def STAGE_APP_URL
 
 pipeline {
   agent none
@@ -23,7 +25,7 @@ pipeline {
       steps {
         sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
         script {
-          TESTS_RESULTS = sh (
+          UNIT_TESTS_RESULTS = sh (
             script: "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' test",
             returnStatus: true
           )
@@ -36,7 +38,7 @@ pipeline {
       agent any
       steps {
         script {
-          if (TESTS_RESULTS != EXPECTED_TESTS_RESULTS) {
+          if (UNIT_TESTS_RESULTS != EXPECTED_TESTS_RESULTS) {
             currentBuild.result = 'ABORTED'
             error('Stopping early due to tests failure')
           }
@@ -70,18 +72,17 @@ pipeline {
         GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
       }
       steps {
-        // sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}"
-        // sh "docker build -t ${ECR_REPOSITORY_URL} . --no-cache"
-        // sh "docker tag ${ECR_REPOSITORY_URL}:latest ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
-        // sh "docker push ${ECR_REPOSITORY_URL}:latest"
-        // sh "docker push ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
-        // sh 'docker logout'
-        // sh 'docker system prune -a'
-        echo "Building..."
+        sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}"
+        sh "docker build -t ${ECR_REPOSITORY_URL} . --no-cache"
+        sh "docker tag ${ECR_REPOSITORY_URL}:latest ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
+        sh "docker push ${ECR_REPOSITORY_URL}:latest"
+        sh "docker push ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
+        sh 'docker logout'
+        sh 'docker system prune -a'
       }
     }
 
-    stage('Deploy') {
+    stage('Deploy to Stage environment') {
       agent { 
         label 'terraform'
       }
@@ -89,12 +90,63 @@ pipeline {
         GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
       }
       steps {
-        dir("terraform") {
-          // sh "pwd"
-          // sh "terraform init -input=false"
-          // sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -auto-approve -no-color"
-          // sh "terraform output"
-          echo "Deploying..."
+        dir("terraform/stage") {
+          sh "pwd"
+          sh "terraform init -input=false"
+          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -auto-approve -no-color"
+          script {
+            STAGE_APP_URL = sh (
+              script: "terraform output --raw load_balancer_ip", 
+              returnStdout: true
+            )
+          }
+        }
+      }
+    }
+
+    stage('Run E2E tests') {
+      agent{
+        label 'docker'
+      }
+      steps{
+        sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
+        script {
+          E2E_TESTS_RESULTS = sh (
+            script: "docker run --rm -m 1g --cpus 1 -e PAGE_URL=${STAGE_APP_URL} -v $(pwd):/app mcr.microsoft.com/playwright:v1.28.0-focal yarn --cwd '/app' test:e2e",
+            returnStatus: true
+          )
+        }
+        junit '__tests__/__results__/playwright-junit.xml'
+      }
+    }
+
+    stage('Check E2E results') {
+      agent any
+      steps {
+        script {
+          if (E2E_TESTS_RESULTS != EXPECTED_TESTS_RESULTS) {
+            currentBuild.result = 'ABORTED'
+            error('Stopping early due to e2e tests failure')
+          } else {
+            input(message: 'Deploy to production?' ok: 'Yes')
+          }
+        }
+      }
+    }
+
+    stage('Deploy to Production environment') {
+      agent { 
+        label 'terraform'
+      }
+      environment {
+        GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
+      }
+      steps {
+        dir("terraform/stage") {
+          sh "pwd"
+          sh "terraform init -input=false"
+          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -auto-approve -no-color"
+          sh "terraform output"
         }
       }
     }
