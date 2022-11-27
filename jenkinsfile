@@ -38,10 +38,8 @@ pipeline {
           TESTS_RESULTS != 0
         }
       }
-      steps {
-        currentBuild.result = 'ABORTED'
-        error('Stopping early due to tests failure')
-      }
+      currentBuild.result = 'ABORTED'
+      error('Stopping early due to tests failure')
     }
 
     stage('Prepare Image Registry') {
