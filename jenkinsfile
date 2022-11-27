@@ -1,4 +1,5 @@
 def ECR_REPOSITORY_URL
+def TESTS_RESULTS
 
 pipeline {
   agent none
@@ -20,8 +21,26 @@ pipeline {
       }
       steps {
         sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
-        sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' test"
+        script {
+          TESTS_RESULTS = sh (
+            script: "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' test",
+            returnStatus: true
+          )
+        }
         junit '__tests__/__results__/jest-junit.xml'
+      }
+    }
+
+    stage('Check results') {
+      agent any
+      when {
+        expression {
+          TESTS_RESULTS != 0
+        }
+      }
+      steps {
+        currentBuild.result = 'ABORTED'
+        error('Stopping early due to tests failure')
       }
     }
 
