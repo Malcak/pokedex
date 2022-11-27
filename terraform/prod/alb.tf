@@ -2,6 +2,10 @@ resource "aws_lb" "default" {
   name            = "pokedex-lb"
   subnets         = aws_subnet.public.*.id
   security_groups = [aws_security_group.lb_sg.id]
+
+  tags = {
+    "Name" : "${var.project}-${var.environment}-lb"
+  }
 }
 
 resource "aws_lb_target_group" "pokedex_tg" {
@@ -10,6 +14,10 @@ resource "aws_lb_target_group" "pokedex_tg" {
   protocol    = "HTTP"
   vpc_id      = aws_vpc.default.id
   target_type = "ip"
+
+  tags = {
+    "Name" : "${var.project}-${var.environment}-tg"
+  }
 }
 
 resource "aws_lb_listener" "pokedex_lb_listener" {
@@ -20,5 +28,9 @@ resource "aws_lb_listener" "pokedex_lb_listener" {
   default_action {
     target_group_arn = aws_lb_target_group.pokedex_tg.id
     type             = "forward"
+  }
+
+  tags = {
+    "Name" : "${var.project}-${var.environment}-lblistener"
   }
 }

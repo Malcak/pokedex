@@ -15,6 +15,10 @@ resource "aws_security_group" "lb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    "Name" : "${var.project}-${var.environment}-lbsg"
+  }
 }
 
 resource "aws_security_group" "pokedex_task_sg" {
@@ -33,5 +37,9 @@ resource "aws_security_group" "pokedex_task_sg" {
     from_port   = 0
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    "Name" : "${var.project}-${var.environment}-tdsg"
   }
 }

@@ -23,10 +23,18 @@ resource "aws_ecs_task_definition" "pokedex_ecs_td" {
     }
   ]
   DEFINITION
+
+  tags = {
+    "Name" : "${var.project}-${var.environment}-td"
+  }
 }
 
 resource "aws_ecs_cluster" "main" {
   name = "pokedex-cluster"
+
+  tags = {
+    "Name" : "${var.project}-${var.environment}-ecscluster"
+  }
 }
 
 resource "aws_ecs_service" "pokedex" {
@@ -48,4 +56,8 @@ resource "aws_ecs_service" "pokedex" {
   }
 
   depends_on = [aws_lb_listener.pokedex_lb_listener]
+
+  tags = {
+    "Name" : "${var.project}-${var.environment}-ecsservice"
+  }
 }
