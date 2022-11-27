@@ -5,13 +5,13 @@ variable "region" {
 }
 
 variable "environment" {
-  description = "Environment Name"
+  description = "Environment name"
   type        = string
-  default     = "prod"
+  default     = "stage"
 }
 
 variable "project" {
-  description = "Project Name"
+  description = "Project name"
   type        = string
   default     = "pokedex"
 }
@@ -23,11 +23,18 @@ variable "app_count" {
 }
 
 variable "vpc_cidr" {
-  type    = string
-  default = "10.1.0.0/16"
+  description = "Virtual private cloud cidr"
+  type        = string
+  default     = "10.1.0.0/16"
 }
 
 variable "image_tag" {
-  type    = string
-  default = "latest"
+  description = "Docker image tag"
+  type        = string
+  default     = "latest"
+}
+
+variable "ecr_repository_url" {
+  description = "Image repository URL"
+  type        = string
 }

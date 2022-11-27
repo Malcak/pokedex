@@ -7,10 +7,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "pokedex-terraform-state"
-    key            = "global/s3/terraform.tfstate"
+    bucket         = "pokedex-stage-terraform-state"
+    key            = "stage/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "pokedex-terraform-locks"
+    dynamodb_table = "pokedex-stage-terraform-locks"
     encrypt        = true
   }
 }
@@ -24,14 +24,4 @@ provider "aws" {
       "Project"     = var.project
     }
   }
-}
-
-module "backend" {
-  source  = "./modules/tf-s3-backend"
-  project = var.project
-}
-
-module "ecr" {
-  source  = "./modules/ecr"
-  project = var.project
 }
