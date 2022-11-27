@@ -93,7 +93,7 @@ pipeline {
         dir("terraform/stage") {
           sh "pwd"
           sh "terraform init -input=false"
-          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${STAGE_APP_URL}' -auto-approve -no-color"
+          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${ECR_REPOSITORY_URL}' -auto-approve -no-color"
           script {
             STAGE_APP_URL = sh (
               script: "terraform output --raw load_balancer_ip", 
@@ -145,7 +145,7 @@ pipeline {
         dir("terraform/stage") {
           sh "pwd"
           sh "terraform init -input=false"
-          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${STAGE_APP_URL}' -auto-approve -no-color"
+          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${ECR_REPOSITORY_URL}' -auto-approve -no-color"
           sh "terraform output"
         }
       }
