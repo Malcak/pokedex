@@ -12,7 +12,7 @@ describe('Pokemon Card Component', () => {
     expect(container).toMatchSnapshot()
   })
 
-  it('lets have sexu', async () => {
+  it('should display the correct pokemon information', async () => {
     const wrapper = render(<Component pokemon={bulbasaur} />)
     expect(
       (await wrapper.findAllByRole('img', { name: bulbasaur.name })).at(0),
