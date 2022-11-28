@@ -1,5 +1,5 @@
 resource "aws_security_group" "lb_sg" {
-  name   = "pokedex-alb-security-group"
+  name   = "${var.project}-${var.environment}-alb-security-group"
   vpc_id = aws_vpc.default.id
 
   ingress {
@@ -22,7 +22,7 @@ resource "aws_security_group" "lb_sg" {
 }
 
 resource "aws_security_group" "pokedex_task_sg" {
-  name   = "pokedex-task-security-group"
+  name   = "${var.project}-${var.environment}-task-security-group"
   vpc_id = aws_vpc.default.id
 
   ingress {

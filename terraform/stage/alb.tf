@@ -1,5 +1,5 @@
 resource "aws_lb" "default" {
-  name            = "pokedex-lb"
+  name            = "${var.project}-${var.environment}-lb"
   subnets         = aws_subnet.public.*.id
   security_groups = [aws_security_group.lb_sg.id]
 
@@ -9,7 +9,7 @@ resource "aws_lb" "default" {
 }
 
 resource "aws_lb_target_group" "pokedex_tg" {
-  name        = "pokedex-target-group"
+  name        = "${var.project}-${var.environment}-target-group"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.default.id

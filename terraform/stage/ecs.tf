@@ -1,28 +1,30 @@
+data "aws_iam_role" "ecs_task_execution_role" {
+  name = "ecsTaskExecutionRole"
+}
+
 resource "aws_ecs_task_definition" "pokedex_ecs_td" {
-  family                   = "pokedex"
+  family                   = "${var.project}-${var.environment}-td"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
 
-  container_definitions = <<DEFINITION
-  [
+  container_definitions = jsonencode([
     {
-      "image": "${var.ecr_repository_url}:${var.image_tag}",
-      "cpu": 256,
-      "memory": 512,
-      "name": "pokedex",
-      "networkMode": "awsvpc",
-      "portMappings": [
+      name        = "${var.project}-${var.environment}-container"
+      image       = "${var.ecr_repository_url}:${var.image_tag}"
+      cpu         = 256
+      memory      = 512
+      networkMode = "awsvpc"
+      portMappings = [
         {
-          "containerPort": 3000,
-          "hostPort": 3000
+          containerPort = 3000
+          hostPort      = 3000
         }
       ]
     }
-  ]
-  DEFINITION
+  ])
 
   tags = {
     "Name" : "${var.project}-${var.environment}-td"
@@ -30,7 +32,7 @@ resource "aws_ecs_task_definition" "pokedex_ecs_td" {
 }
 
 resource "aws_ecs_cluster" "main" {
-  name = "pokedex-cluster"
+  name = "${var.project}-${var.environment}-cluster"
 
   tags = {
     "Name" : "${var.project}-${var.environment}-ecscluster"
@@ -38,7 +40,7 @@ resource "aws_ecs_cluster" "main" {
 }
 
 resource "aws_ecs_service" "pokedex" {
-  name            = "pokedex-service"
+  name            = "${var.project}-${var.environment}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.pokedex_ecs_td.arn
   desired_count   = var.app_count
@@ -51,7 +53,7 @@ resource "aws_ecs_service" "pokedex" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.pokedex_tg.id
-    container_name   = "pokedex"
+    container_name   = "${var.project}-${var.environment}-container"
     container_port   = 3000
   }
 
