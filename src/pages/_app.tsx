@@ -3,7 +3,8 @@ import type { AppProps } from 'next/app'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { NextUIProvider } from '@nextui-org/react'
 
-import { darkTheme, lightTheme } from '../lib/theme'
+import { darkTheme, lightTheme } from '@lib/theme'
+import MainLayout from '@components/layouts/main'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -16,7 +17,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       }}
     >
       <NextUIProvider>
-        <Component {...pageProps} />
+        <MainLayout title="pokemon list">
+          <Component {...pageProps} />
+        </MainLayout>
       </NextUIProvider>
     </NextThemesProvider>
   )
