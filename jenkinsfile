@@ -5,13 +5,14 @@ def E2E_TESTS_RESULTS
 def STAGE_APP_URL
 
 pipeline {
-  agent none
+  agent any
 
   options {
     buildDiscarder(logRotator(numToKeepStr: '4', artifactNumToKeepStr: '4'))
   }
 
   environment {
+    GIT_COMMIT_HASH       = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     TF_IN_AUTOMATION      = '1'
@@ -68,9 +69,6 @@ pipeline {
       agent {
         label 'docker && awscli'
       }
-      environment {
-        GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
-      }
       steps {
         sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}"
         sh "docker build -t ${ECR_REPOSITORY_URL} . --no-cache"
@@ -85,9 +83,6 @@ pipeline {
     stage('Deploy to Stage environment') {
       agent { 
         label 'terraform'
-      }
-      environment {
-        GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
       }
       steps {
         dir("terraform/stage") {
@@ -105,10 +100,10 @@ pipeline {
     }
 
     stage('Run E2E tests') {
-      agent{
+      agent {
         label 'docker'
       }
-      steps{
+      steps {
         sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
         script {
           E2E_TESTS_RESULTS = sh (
@@ -137,9 +132,6 @@ pipeline {
     stage('Deploy to Production environment') {
       agent { 
         label 'terraform'
-      }
-      environment {
-        GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
       }
       steps {
         dir("terraform/stage") {
