@@ -25,3 +25,11 @@ provider "aws" {
     }
   }
 }
+
+module "network" {
+  source                    = "../modules/network"
+  environment               = var.environment
+  project                   = var.project
+  vpc_cidr                  = var.vpc_cidr
+  number_redundant_networks = 2
+}

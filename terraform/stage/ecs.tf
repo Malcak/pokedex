@@ -48,7 +48,7 @@ resource "aws_ecs_service" "pokedex" {
 
   network_configuration {
     security_groups = [aws_security_group.pokedex_task_sg.id]
-    subnets         = aws_subnet.private.*.id
+    subnets         = module.network.private_subnets
   }
 
   load_balancer {
