@@ -1,0 +1,156 @@
+static final EXPECTED_TESTS_RESULTS = 0
+def ECR_REPOSITORY_URL
+def UNIT_TESTS_RESULTS
+def E2E_TESTS_RESULTS
+def STAGE_APP_URL
+
+pipeline {
+  agent any
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '4', artifactNumToKeepStr: '4'))
+  }
+
+  environment {
+    GIT_COMMIT_HASH       = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
+    AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    TF_IN_AUTOMATION      = '1'
+  }
+
+  stages {
+    stage('Run Unit tests') {
+      agent {
+        label 'docker'
+      }
+      steps {
+        sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
+        script {
+          UNIT_TESTS_RESULTS = sh (
+            script: "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' test",
+            returnStatus: true
+          )
+        }
+        junit '__tests__/__results__/jest-junit.xml'
+      }
+    }
+
+    stage('Check results') {
+      agent any
+      steps {
+        script {
+          if (UNIT_TESTS_RESULTS != EXPECTED_TESTS_RESULTS) {
+            currentBuild.result = 'ABORTED'
+            error('Stopping early due to tests failure')
+          }
+        }
+      }
+    }
+
+    stage('Prepare Image Registry') {
+      agent { 
+        label 'terraform'
+      }
+      when { anyOf { branch 'main'; branch 'stage' } }
+      steps {
+        dir("terraform/global") {
+          sh 'terraform init -input=false'
+          sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
+          script {
+            ECR_REPOSITORY_URL = sh (
+              script: "terraform output --raw ecr_repository_url", 
+              returnStdout: true
+            )
+          }
+        }
+      }
+    }
+
+    stage('Build & Push Image') {
+      agent {
+        label 'docker && awscli'
+      }
+      when { anyOf { branch 'main'; branch 'stage' } }
+      steps {
+        sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}"
+        sh "docker build -t ${ECR_REPOSITORY_URL} . --no-cache"
+        sh "docker tag ${ECR_REPOSITORY_URL}:latest ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
+        sh "docker push ${ECR_REPOSITORY_URL}:latest"
+        sh "docker push ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
+        sh 'docker logout'
+        sh 'docker system prune -a'
+      }
+    }
+
+    stage('Deploy to Stage environment') {
+      agent { 
+        label 'terraform'
+      }
+      when { anyOf { branch 'main'; branch 'stage' } }
+      steps {
+        dir("terraform/stage") {
+          sh "pwd"
+          sh "terraform init -input=false"
+          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${ECR_REPOSITORY_URL}' -auto-approve -no-color"
+          script {
+            STAGE_APP_URL = sh (
+              script: "terraform output --raw load_balancer_ip", 
+              returnStdout: true
+            )
+          }
+        }
+      }
+    }
+
+    stage('Run E2E tests') {
+      agent {
+        label 'docker'
+      }
+      when { anyOf { branch 'main'; branch 'stage' } }
+      steps {
+        sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
+        script {
+          E2E_TESTS_RESULTS = sh (
+            script: "docker run --rm -m 1g --cpus 1 -e PAGE_URL='http://${STAGE_APP_URL}' -v \$(pwd):/app mcr.microsoft.com/playwright:v1.28.0-focal yarn --cwd '/app' test:e2e",
+            returnStatus: true
+          )
+        }
+        junit '__tests__/__results__/playwright-junit.xml'
+      }
+    }
+
+    stage('Check E2E results') {
+      agent any
+      when { anyOf { branch 'main'; branch 'stage' } }
+      steps {
+        script {
+          if (E2E_TESTS_RESULTS != EXPECTED_TESTS_RESULTS) {
+            currentBuild.result = 'ABORTED'
+            error('Stopping early due to e2e tests failure')
+          }
+        }
+      }
+    }
+
+    stage('Deploy to Production environment') {
+      agent { 
+        label 'terraform'
+      }
+      when { branch 'main' }
+      steps {
+        dir("terraform/stage") {
+          sh "pwd"
+          sh "terraform init -input=false"
+          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${ECR_REPOSITORY_URL}' -auto-approve -no-color"
+          sh "terraform output"
+        }
+      }
+    }
+
+    // post {
+    //   always {
+    //     emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+    //   }
+    // }
+  }
+}

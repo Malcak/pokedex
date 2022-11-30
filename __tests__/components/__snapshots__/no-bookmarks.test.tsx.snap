@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`No Bookmarks Component should display the component correctly 1`] = `
+<div>
+  <div
+    class="nextui-c-fdHeMm nextui-c-fdHeMm-dwxLNB-responsive-true nextui-c-fdHeMm-iddFAvP-css"
+  >
+    <h1
+      class="nextui-c-PJLV nextui-c-PJLV-ijnlmIz-css"
+    >
+      No Bookmarks
+    </h1>
+    <div
+      class="nextui-c-iVzbCs nextui-c-iVzbCs-bDGmTT-ready-true nextui-c-iVzbCs-icyIdfc-css nextui-image-container nextui-image--loading"
+      data-state="loading"
+    >
+      <div
+        class="nextui-c-FIiRH nextui-c-FIiRH-ibDGmTT-css nextui-image-skeleton"
+      />
+      <img
+        alt="Ditto"
+        class="nextui-c-kbhVdb nextui-c-kbhVdb-ifPCDPm-css nextui-image"
+        data-state="loading"
+        height="250"
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/132.svg"
+        width="250"
+      />
+    </div>
+  </div>
+</div>
+`;
