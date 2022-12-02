@@ -52,8 +52,7 @@ pipeline {
     stage('SonarQube analysis') {
       steps {
         withSonarQubeEnv('Malcak Sonarqube') {
-          sh "docker run --rm -e SONAR_HOST_URL=\"http://${SONARQUBE_URL}\" -e SONAR_SCANNER_OPTS=\"-Dsonar.projectKey=pkd\" -e SONAR_LOGIN=\"${SONAR_LOGIN}\" -v \"\$(pwd):/usr/src\" sonarsource/sonar-scanner-cli"
-          
+          sh 'docker run --rm -e SONAR_HOST_URL="http://$SONARQUBE_URL" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=pkd" -e SONAR_LOGIN="$SONAR_LOGIN" -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli'
         }
       }
     }
