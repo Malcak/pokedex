@@ -48,10 +48,10 @@ pipeline {
     }
 
     stage('SonarQube analysis') {
-      script {
-        def scannerHome = tool 'SonarScanner 4';
-      }
       steps {
+        script {
+          def scannerHome = tool 'SonarScanner 4';
+        }
         withSonarQubeEnv('Malcak Sonarqube') {
           sh "${scannerHome}/bin/sonar-scanner"
         }
