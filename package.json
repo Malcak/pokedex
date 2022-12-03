@@ -26,8 +26,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --ci --reporters=default --reporters=jest-junit",
-    "test:e2e": "playwright test"
+    "test": "jest --ci --reporters=default --reporters=jest-junit --coverage --collectCoverageFrom='./src/**'",
+    "test:e2e": "playwright test",
+    "test:coverage": "jest --ci --coverage --collectCoverageFrom='./src/**'"
   },
   "dependencies": {
     "@nextui-org/react": "^1.0.0-beta.10",

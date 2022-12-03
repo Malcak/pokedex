@@ -15,6 +15,8 @@ pipeline {
     GIT_COMMIT_HASH       = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    SONAR_LOGIN           = credentials('jenkins-sonar-token')
+    SONARQUBE_URL         = 'https://sonarqube.malcak.me/'
     TF_IN_AUTOMATION      = '1'
   }
 
@@ -47,6 +49,25 @@ pipeline {
       }
     }
 
+    stage('SonarQube analysis') {
+      agent { label 'docker' }
+      steps {
+        withSonarQubeEnv('Malcak Sonarqube') {
+          sh 'docker run --rm -m 1g --cpus 1 -v $(pwd):/app node:16 yarn --cwd "/app" install --forzen-lockfile'
+          sh 'docker run --rm -m 1g --cpus 1 -v $(pwd):/app node:16 yarn --cwd "/app" test:coverage'
+          sh 'docker run --rm -e SONAR_HOST_URL="http://$SONARQUBE_URL" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=pkd" -e SONAR_LOGIN="$SONAR_LOGIN" -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli'
+        }
+      }
+    }
+
+    stage("Quality Gate") {
+      steps{
+        timeout(time: 1, unit: 'HOURS') {
+          waitForQualityGate abortPipeline: true
+        }
+      }
+    }
+
     stage('Prepare Image Registry') {
       agent { 
         label 'terraform'
@@ -54,7 +75,7 @@ pipeline {
       when { anyOf { branch 'main'; branch 'stage' } }
       steps {
         dir("terraform/global") {
-          sh 'terraform init -input=false'
+          sh 'terraform init -input=false -no-color'
           sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
           script {
             ECR_REPOSITORY_URL = sh (
@@ -89,8 +110,7 @@ pipeline {
       when { anyOf { branch 'main'; branch 'stage' } }
       steps {
         dir("terraform/stage") {
-          sh "pwd"
-          sh "terraform init -input=false"
+          sh "terraform init -input=false -no-color"
           sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${ECR_REPOSITORY_URL}' -auto-approve -no-color"
           script {
             STAGE_APP_URL = sh (
@@ -138,9 +158,9 @@ pipeline {
       }
       when { branch 'main' }
       steps {
+        // dir("terraform/prod") {
         dir("terraform/stage") {
-          sh "pwd"
-          sh "terraform init -input=false"
+          sh "terraform init -input=false -no-color"
           sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${ECR_REPOSITORY_URL}' -auto-approve -no-color"
           sh "terraform output"
         }
