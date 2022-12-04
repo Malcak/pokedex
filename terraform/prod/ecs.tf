@@ -1,5 +1,5 @@
 data "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecsTaskExecutionRole"
+  name = "pokedex-ecs-task-execution-role"
 }
 
 resource "aws_ecs_task_definition" "pokedex_ecs_td" {
