@@ -26,9 +26,8 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_eip" "gateway" {
-  count      = var.redundant_zones
-  vpc        = true
-  depends_on = [aws_internet_gateway.gateway]
+  count = var.redundant_zones
+  vpc   = true
 
   tags = {
     "Name" : "${var.project}-${var.environment}-eip"
