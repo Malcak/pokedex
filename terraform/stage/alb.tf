@@ -12,7 +12,7 @@ resource "aws_lb_target_group" "pokedex_tg" {
   name        = "${var.project}-${var.environment}-target-group"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = module.network.vpc_id
+  vpc_id      = aws_vpc.default.id
   target_type = "ip"
 
   tags = {

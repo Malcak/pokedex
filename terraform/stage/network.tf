@@ -27,4 +27,5 @@ module "network" {
   vpc_id          = aws_vpc.default.id
   vpc_cidr        = aws_vpc.default.cidr_block
   redundant_zones = 2
+  depends_on      = [aws_internet_gateway.gateway]
 }
