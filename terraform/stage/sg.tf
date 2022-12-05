@@ -1,6 +1,6 @@
 resource "aws_security_group" "lb_sg" {
   name   = "${var.project}-${var.environment}-alb-security-group"
-  vpc_id = module.network.vpc_id
+  vpc_id = aws_vpc.default.id
 
   ingress {
     protocol    = "tcp"
@@ -23,7 +23,7 @@ resource "aws_security_group" "lb_sg" {
 
 resource "aws_security_group" "pokedex_task_sg" {
   name   = "${var.project}-${var.environment}-task-security-group"
-  vpc_id = module.network.vpc_id
+  vpc_id = aws_vpc.default.id
 
   ingress {
     protocol        = "tcp"

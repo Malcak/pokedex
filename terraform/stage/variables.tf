@@ -16,10 +16,16 @@ variable "project" {
   default     = "pokedex"
 }
 
+variable "instance_type" {
+  description = "Intance type"
+  type        = string
+  default     = "t2.micro"
+}
+
 variable "app_count" {
   description = "Number of container running"
   type        = number
-  default     = 1
+  default     = 3
 }
 
 variable "vpc_cidr" {
