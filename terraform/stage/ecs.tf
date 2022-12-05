@@ -66,7 +66,7 @@ resource "aws_ecs_service" "pokedex" {
   task_definition                    = aws_ecs_task_definition.pokedex_ecs_td.arn
   desired_count                      = var.app_count
   deployment_maximum_percent         = 100
-  deployment_minimum_healthy_percent = 0
+  deployment_minimum_healthy_percent = 100
   scheduling_strategy                = "REPLICA"
 
   deployment_controller {
