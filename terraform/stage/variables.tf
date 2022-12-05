@@ -25,7 +25,7 @@ variable "instance_type" {
 variable "app_count" {
   description = "Number of container running"
   type        = number
-  default     = 5
+  default     = 3
 }
 
 variable "vpc_cidr" {
