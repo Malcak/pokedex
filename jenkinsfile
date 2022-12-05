@@ -107,7 +107,7 @@ pipeline {
       agent { 
         label 'terraform'
       }
-      when { anyOf { branch 'main'; branch 'stage' } }
+      when { anyOf { branch 'stage' } }
       steps {
         dir("terraform/stage") {
           sh "terraform init -input=false -no-color"
@@ -127,7 +127,7 @@ pipeline {
       agent {
         label 'docker'
       }
-      when { anyOf { branch 'main'; branch 'stage' } }
+      when { branch 'stage' } }
       steps {
         sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
         script {
@@ -142,7 +142,7 @@ pipeline {
 
     stage('Check E2E results') {
       agent any
-      when { anyOf { branch 'main'; branch 'stage' } }
+      when { branch 'stage' } }
       steps {
         script {
           if (E2E_TESTS_RESULTS != EXPECTED_TESTS_RESULTS) {
