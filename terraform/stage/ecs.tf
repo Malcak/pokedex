@@ -61,11 +61,17 @@ resource "aws_ecs_cluster" "main" {
 }
 
 resource "aws_ecs_service" "pokedex" {
-  name                = "${var.project}-${var.environment}-service"
-  cluster             = aws_ecs_cluster.main.id
-  task_definition     = aws_ecs_task_definition.pokedex_ecs_td.arn
-  desired_count       = var.app_count
-  scheduling_strategy = "REPLICA"
+  name                               = "${var.project}-${var.environment}-service"
+  cluster                            = aws_ecs_cluster.main.id
+  task_definition                    = aws_ecs_task_definition.pokedex_ecs_td.arn
+  desired_count                      = var.app_count
+  deployment_maximum_percent         = 100
+  deployment_minimum_healthy_percent = 0
+  scheduling_strategy                = "REPLICA"
+
+  deployment_controller {
+    type = "ECS"
+  }
 
   network_configuration {
     security_groups = [aws_security_group.pokedex_task_sg.id]
