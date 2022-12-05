@@ -118,7 +118,6 @@ pipeline {
               returnStdout: true
             )
           }
-          sh "sleep 60s"
         }
       }
     }
