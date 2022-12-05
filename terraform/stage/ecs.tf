@@ -68,6 +68,7 @@ resource "aws_ecs_service" "pokedex" {
   deployment_maximum_percent         = 100
   deployment_minimum_healthy_percent = 0
   scheduling_strategy                = "REPLICA"
+  wait_for_steady_state              = true
 
   deployment_controller {
     type = "ECS"
