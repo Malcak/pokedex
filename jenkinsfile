@@ -99,7 +99,7 @@ pipeline {
         sh "docker push ${ECR_REPOSITORY_URL}:latest"
         sh "docker push ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
         sh 'docker logout'
-        sh 'docker system prune -a'
+        sh 'docker image prune --filter label=stage=building -f'
       }
     }
 
