@@ -279,12 +279,13 @@ resource "aws_cloudwatch_log_group" "log_group" {
 }
 
 resource "aws_instance" "scraper" {
-  ami                    = data.aws_ami.latest_amazonlinux_ecs.id
-  instance_type          = var.instance_type
-  vpc_security_group_ids = aws_security_group.scraper.*.id
-  subnet_id              = module.network.public_subnets[0]
-  iam_instance_profile   = data.aws_iam_instance_profile.prometheus_profile.name
-  key_name               = data.aws_key_pair.key_pair.key_name
+  ami                         = data.aws_ami.latest_amazonlinux_ecs.id
+  instance_type               = var.instance_type
+  vpc_security_group_ids      = aws_security_group.scraper.*.id
+  subnet_id                   = module.network.public_subnets[0]
+  iam_instance_profile        = data.aws_iam_instance_profile.prometheus_profile.name
+  key_name                    = data.aws_key_pair.key_pair.key_name
+  associate_public_ip_address = true
 
   root_block_device {
     volume_size = 30
