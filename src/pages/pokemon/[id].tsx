@@ -35,6 +35,9 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
               <Text h1 transform="capitalize">
                 {pokemon.name}
               </Text>
+              <Button color="gradient" ghost>
+                Save bookmark
+              </Button>
             </Card.Header>
             <div>
               {pokemon.types.map(({ type }) => {
