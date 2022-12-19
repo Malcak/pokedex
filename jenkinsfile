@@ -15,8 +15,8 @@ pipeline {
     GIT_COMMIT_HASH       = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    SONAR_LOGIN           = vault path: 'kv/data/cicd', key: 'sonar-token'
-    SONAR_WEBHOOK_SECRET  = vault path: 'kv/data/cicd', key: 'sonar-webhook-secret'
+    SONAR_LOGIN           = vault path: 'kv/cicd', key: 'sonar-token'
+    SONAR_WEBHOOK_SECRET  = vault path: 'kv/cicd', key: 'sonar-webhook-secret'
     SONARQUBE_URL         = 'https://sonarqube.malcak.me/'
     TF_IN_AUTOMATION      = '1'
   }
