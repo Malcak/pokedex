@@ -15,8 +15,6 @@ pipeline {
     GIT_COMMIT_HASH       = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
     AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    SONAR_LOGIN           = vault path: 'kv/cicd', key: 'sonar-token'
-    SONAR_WEBHOOK_SECRET  = vault path: 'kv/cicd', key: 'sonar-webhook-secret'
     SONARQUBE_URL         = 'https://sonarqube.malcak.me/'
     TF_IN_AUTOMATION      = '1'
   }
@@ -56,7 +54,7 @@ pipeline {
         withSonarQubeEnv('Malcak Sonarqube') {
           sh 'docker run --rm -m 1g --cpus 1 -v $(pwd):/app node:16 yarn --cwd "/app" install --forzen-lockfile'
           sh 'docker run --rm -m 1g --cpus 1 -v $(pwd):/app node:16 yarn --cwd "/app" test:coverage'
-          sh 'docker run --rm -e SONAR_HOST_URL=$SONAR_HOST_URL -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=pkd" -e SONAR_LOGIN="$SONAR_LOGIN" -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli'
+          sh 'docker run --rm -e SONAR_HOST_URL=$SONAR_HOST_URL -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=pkd" -e SONAR_LOGIN=$SONAR_AUTH_TOKEN -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli'
         }
       }
     }
@@ -64,7 +62,7 @@ pipeline {
     stage("Quality Gate") {
       steps{
         timeout(time: 1, unit: 'HOURS') {
-          waitForQualityGate(webhookSecretId: SONAR_WEBHOOK_SECRET, abortPipeline: true)
+          waitForQualityGate abortPipeline: true
         }
       }
     }
