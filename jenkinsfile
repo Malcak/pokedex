@@ -12,9 +12,10 @@ pipeline {
   }
 
   environment {
-    GIT_COMMIT_HASH     = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
-    AWS_IAM_CREDENTIALS = credentials('aws-iam-credential')
-    TF_IN_AUTOMATION    = '1'
+    GIT_COMMIT_HASH       = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
+    AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
+    AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+    TF_IN_AUTOMATION      = '1'
   }
 
   stages {
@@ -62,12 +63,6 @@ pipeline {
         timeout(time: 1, unit: 'HOURS') {
           waitForQualityGate abortPipeline: true
         }
-      }
-    }
-
-    stage("Credential tests") {
-      steps {
-        echo AWS_IAM_CREDENTIALS
       }
     }
 
