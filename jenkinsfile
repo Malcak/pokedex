@@ -72,16 +72,16 @@ pipeline {
       }
       when { anyOf { branch 'main'; branch 'stage' } }
       steps {
-        // dir("terraform/global") {
-        //   sh 'terraform init -input=false -no-color'
-        //   sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
-        //   script {
-        //     ECR_REPOSITORY_URL = sh (
-        //       script: "terraform output --raw ecr_repository_url", 
-        //       returnStdout: true
-        //     )
-        //   }
-        // }
+        dir("terraform/global") {
+          sh 'terraform init -input=false -no-color'
+          sh 'terraform apply -target module.ecr -input=false -auto-approve -no-color'
+          script {
+            ECR_REPOSITORY_URL = sh (
+              script: "terraform output --raw ecr_repository_url", 
+              returnStdout: true
+            )
+          }
+        }
         echo "Registry ..."
       }
     }
@@ -92,13 +92,13 @@ pipeline {
       }
       when { anyOf { branch 'main'; branch 'stage' } }
       steps {
-        // sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}"
-        // sh "docker build -t ${ECR_REPOSITORY_URL} . --no-cache"
-        // sh "docker tag ${ECR_REPOSITORY_URL}:latest ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
-        // sh "docker push ${ECR_REPOSITORY_URL}:latest"
-        // sh "docker push ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
-        // sh 'docker logout'
-        // sh 'docker image prune --filter label=stage=building -f'
+        sh "aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}"
+        sh "docker build -t ${ECR_REPOSITORY_URL} . --no-cache"
+        sh "docker tag ${ECR_REPOSITORY_URL}:latest ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
+        sh "docker push ${ECR_REPOSITORY_URL}:latest"
+        sh "docker push ${ECR_REPOSITORY_URL}:${GIT_COMMIT_HASH}"
+        sh 'docker logout'
+        sh 'docker image prune --filter label=stage=building -f'
         echo "Building the image ..."
       }
     }
