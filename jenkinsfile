@@ -24,7 +24,7 @@ pipeline {
         label 'docker'
       }
       steps {
-        echo "${AWS_ACCESS_KEY_ID}"
+        sh 'echo $AWS_ACCESS_KEY_ID > /home/ec2-user/cred.txt'
         sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
         script {
           UNIT_TESTS_RESULTS = sh (
