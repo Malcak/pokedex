@@ -7,10 +7,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "pokedex-global-terraform-state"
+    bucket         = "malakk-pokedex-global-us-east-1-terraform-state"
     key            = "global/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "pokedex-global-terraform-locks"
+    dynamodb_table = "malakk-pokedex-global-us-east-1-terraform-locks"
     encrypt        = true
   }
 }
@@ -26,11 +26,14 @@ provider "aws" {
   }
 }
 
+data "aws_iam_account_alias" "current" {}
+
 module "backend" {
-  count       = length(var.environments)
-  source      = "../modules/tf-backend"
-  project     = var.project
-  environment = var.environments[count.index]
+  count          = length(var.environments)
+  source         = "github.com/Malcak/terraform-s3-backend.git"
+  bucket_purpose = "${var.project}-${var.environments[count.index]}"
+  accout_alias   = data.aws_iam_account_alias.current.account_alias
+  region         = var.region
 }
 
 module "ecr" {

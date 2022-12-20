@@ -11,10 +11,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "pokedex-stage-terraform-state"
+    bucket         = "malakk-pokedex-stage-us-east-1-terraform-state"
     key            = "stage/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "pokedex-stage-terraform-locks"
+    dynamodb_table = "malakk-pokedex-stage-us-east-1-terraform-locks"
     encrypt        = true
   }
 }
