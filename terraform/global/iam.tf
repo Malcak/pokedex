@@ -91,3 +91,26 @@ resource "aws_iam_instance_profile" "prometheus_profile" {
   name = "${var.project}-prometheus-instance-profile"
   role = aws_iam_role.prometheus.id
 }
+
+# codedeploy
+
+data "aws_iam_policy_document" "codedeploy_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["codedeploy.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "codedeploy_role" {
+  name               = "${var.project}-codedeploy-role"
+  assume_role_policy = data.aws_iam_policy_document.codedeploy_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "codedeploy_role_policy" {
+  role       = aws_iam_role.codedeploy_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS"
+}
