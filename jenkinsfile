@@ -162,7 +162,6 @@ pipeline {
       when { branch 'main' }
       steps {
         dir("terraform/prod") {
-        dir("terraform/prod") {
           sh "terraform init -input=false -no-color"
           sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${ECR_REPOSITORY_URL}' -auto-approve -no-color"
           sh "terraform output"
