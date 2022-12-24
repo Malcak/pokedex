@@ -28,7 +28,7 @@ resource "aws_codedeploy_deployment_config" "pokedex" {
 resource "aws_codedeploy_deployment_group" "pokedex" {
   app_name               = aws_codedeploy_app.pokedex.name
   deployment_group_name  = "${var.project}-${var.environment}-dg"
-  deployment_config_name = aws_codedeploy_deployment_config.pokedex.deployment_config_name
+  deployment_config_name = aws_codedeploy_deployment_config.pokedex.id
   service_role_arn       = data.aws_iam_role.codedeploy_role.arn
 
   auto_rollback_configuration {
