@@ -38,6 +38,12 @@ resource "aws_lb_listener" "pokedex_lb_listener" {
     type             = "forward"
   }
 
+  lifecycle {
+    ignore_changes = [
+      default_action,
+    ]
+  }
+
   tags = {
     "Name" : "${var.project}-${var.environment}-lblistener"
   }

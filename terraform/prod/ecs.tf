@@ -154,22 +154,16 @@ resource "aws_ecs_task_definition" "pokedex_ecs_td" {
   requires_compatibilities = ["EC2"]
   execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = data.aws_iam_role.ecs_task_execution_role.arn
-  cpu                      = "256"
-  memory                   = "256"
+  cpu                      = "512"
+  memory                   = "512"
 
   container_definitions = jsonencode([
     {
       name        = "${var.project}-${var.environment}-container"
       image       = "${var.ecr_repository_url}:${var.image_tag}"
-      cpu         = 256
-      memory      = 256
+      cpu         = 512
+      memory      = 512
       networkMode = "awsvpc"
-      "environment" : [
-        {
-          "name" : "variable",
-          "value" : "value"
-        }
-      ],
       portMappings = [
         {
           containerPort = 3000
@@ -236,6 +230,17 @@ resource "aws_ecs_service" "pokedex" {
 
   depends_on = [aws_lb_listener.pokedex_lb_listener]
 
+  lifecycle {
+    // NOTE: Based on: https://docs.aws.amazon.com/cli/latest/reference/ecs/update-service.html
+    // If the network configuration, platform version, or task definition need to be updated, a new AWS CodeDeploy deployment should be created.
+    ignore_changes = [
+      desired_count,
+      load_balancer,
+      network_configuration,
+      task_definition
+    ]
+  }
+
   tags = {
     "Name" : "${var.project}-${var.environment}-ecsservice"
   }
@@ -266,9 +271,9 @@ resource "aws_autoscaling_group" "pokedex" {
     id = aws_launch_template.front.id
   }
 
-  desired_capacity          = var.app_count
+  desired_capacity          = var.app_count * 2
   min_size                  = 2
-  max_size                  = 6
+  max_size                  = 8
   health_check_grace_period = 300
   health_check_type         = "EC2"
 }

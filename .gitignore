@@ -61,3 +61,7 @@ terraform.rc
 
 # Project specific
 __tests__/__results__
+
+# Generated files
+appspec.yaml
+appspec.json

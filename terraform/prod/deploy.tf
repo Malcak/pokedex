@@ -28,7 +28,7 @@ resource "aws_codedeploy_deployment_config" "pokedex" {
 resource "aws_codedeploy_deployment_group" "pokedex" {
   app_name               = aws_codedeploy_app.pokedex.name
   deployment_group_name  = "${var.project}-${var.environment}-dg"
-  deployment_config_name = aws_codedeploy_deployment_config.pokedex.deployment_config_name
+  deployment_config_name = aws_codedeploy_deployment_config.pokedex.id
   service_role_arn       = data.aws_iam_role.codedeploy_role.arn
 
   auto_rollback_configuration {
@@ -81,4 +81,16 @@ resource "aws_codedeploy_deployment_group" "pokedex" {
   tags = {
     "Name" = "${var.project}-${var.environment}-dg"
   }
+}
+
+data "template_file" "appspec" {
+  template = file("${path.module}/appspec.tpl")
+  vars = {
+    taskdefinition_arn = aws_ecs_task_definition.pokedex_ecs_td.arn
+  }
+}
+
+resource "local_file" "appspec" {
+  content  = data.template_file.appspec.rendered
+  filename = "${path.module}/appspec.yaml"
 }
