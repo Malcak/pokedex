@@ -82,3 +82,15 @@ resource "aws_codedeploy_deployment_group" "pokedex" {
     "Name" = "${var.project}-${var.environment}-dg"
   }
 }
+
+data "template_file" "appspec" {
+  template = file("${path.module}/appspec.tpl")
+  vars = {
+    taskdefinition_arn = aws_ecs_task_definition.pokedex_ecs_td.arn
+  }
+}
+
+resource "local_file" "appspec" {
+  content  = data.template_file.appspec.rendered
+  filename = "${path.module}/appspec.yaml"
+}
