@@ -105,18 +105,18 @@ pipeline {
       agent { 
         label 'terraform'
       }
-      when { anyOf { branch 'main'; branch 'stage' } }
+      when { anyOf { branch 'stage' } }
       steps {
-        // dir("terraform/stage") {
-        //   sh "terraform init -input=false -no-color"
-        //   sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${ECR_REPOSITORY_URL}' -auto-approve -no-color"
-        //   script {
-        //     STAGE_APP_URL = sh (
-        //       script: "terraform output --raw load_balancer_ip", 
-        //       returnStdout: true
-        //     )
-        //   }
-        // }
+        dir("terraform/stage") {
+          sh "terraform init -input=false -no-color"
+          sh "terraform apply -input=false -var='image_tag=${GIT_COMMIT_HASH}' -var='ecr_repository_url=${ECR_REPOSITORY_URL}' -auto-approve -no-color"
+          script {
+            STAGE_APP_URL = sh (
+              script: "terraform output --raw load_balancer_ip", 
+              returnStdout: true
+            )
+          }
+        }
         echo "Deploying on stage ..."
       }
     }
@@ -125,31 +125,29 @@ pipeline {
       agent {
         label 'docker'
       }
-      when { anyOf { branch 'main'; branch 'stage' } }
+      when { anyOf { branch 'stage' } }
       steps {
-        // sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
-        // script {
-        //   E2E_TESTS_RESULTS = sh (
-        //     script: "docker run --rm -m 1g --cpus 1 -e PAGE_URL='http://${STAGE_APP_URL}' -v \$(pwd):/app mcr.microsoft.com/playwright:v1.28.0-focal yarn --cwd '/app' test:e2e",
-        //     returnStatus: true
-        //   )
-        // }
-        // junit '__tests__/__results__/playwright-junit.xml'
-        echo "testing on stage ..."
+        sh "docker run --rm -m 1g --cpus 1 -v \$(pwd):/app node:16 yarn --cwd '/app' install --forzen-lockfile"
+        script {
+          E2E_TESTS_RESULTS = sh (
+            script: "docker run --rm -m 1g --cpus 1 -e PAGE_URL='http://${STAGE_APP_URL}' -v \$(pwd):/app mcr.microsoft.com/playwright:v1.28.0-focal yarn --cwd '/app' test:e2e",
+            returnStatus: true
+          )
+        }
+        junit '__tests__/__results__/playwright-junit.xml'
       }
     }
 
     stage('Check E2E results') {
       agent any
-      when { anyOf { branch 'main'; branch 'stage' } }
+      when { anyOf { branch 'stage' } }
       steps {
-        // script {
-        //   if (E2E_TESTS_RESULTS != EXPECTED_TESTS_RESULTS) {
-        //     currentBuild.result = 'ABORTED'
-        //     error('Stopping early due to e2e tests failure')
-        //   }
-        // }
-        echo "checking test ..."
+        script {
+          if (E2E_TESTS_RESULTS != EXPECTED_TESTS_RESULTS) {
+            currentBuild.result = 'ABORTED'
+            error('Stopping early due to e2e tests failure')
+          }
+        }
       }
     }
 
